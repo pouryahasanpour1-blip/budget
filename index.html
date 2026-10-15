@@ -273,7 +273,7 @@ svg.lic{width:58%;height:58%;fill:none;stroke:currentColor;stroke-width:1.7;stro
   <div class="csec"><div class="lbl">تگ‌ها</div><div style="display:flex;gap:8px"><input id="ctgi" placeholder="مثلاً آب، برق، گاز" autocomplete="off" style="flex:1"><button class="btn" id="ctga" type="button" style="width:auto;padding:0 18px;margin:0">افزودن</button></div><div class="chips" id="ctg" style="margin-top:8px"></div></div>
   <div class="two"><button class="btn" id="cs">ذخیره</button><button class="btn s" id="cx">بستن</button></div>
   <button class="mb" id="cd" style="color:var(--neg);text-align:center">🗑 حذف دسته</button></div></div>
-<div class="bg" id="tbg"><div class="sheet"><h2>⇄ انتقال بین حساب‌ها</h2><input id="ta" inputmode="decimal" placeholder="0" autocomplete="off" style="font-size:28px;font-weight:800;text-align:center;color:var(--y);padding:16px"><div class="lbl">از حساب</div><div class="chips" id="tfc"></div><select id="tf" hidden></select><div class="lbl">به حساب</div><div class="chips" id="ttc"></div><select id="tt" hidden></select><input id="tn" placeholder="توضیح (اختیاری)" autocomplete="off" style="margin-top:10px"><div class="two"><button class="btn" id="ts">انتقال</button><button class="btn s" id="tx2">بستن</button></div></div></div>
+<div class="bg" id="tbg"><div class="sheet"><h2>⇄ انتقال بین حساب‌ها</h2><input id="ta" inputmode="decimal" placeholder="0" autocomplete="off" style="font-size:28px;font-weight:800;text-align:center;color:var(--y);padding:16px"><div class="lbl">تاریخ</div><div class="adq" id="tdq"><button type="button" data-dq="0">امروز</button><button type="button" data-dq="-1">دیروز</button><button type="button" class="adc" id="tdc">📅 <span id="tdlbl"></span></button></div><div hidden><select id="tdd"></select><select id="tdm"></select><select id="tdy"></select></div><div class="lbl">از حساب</div><div class="chips" id="tfc"></div><select id="tf" hidden></select><div class="lbl">به حساب</div><div class="chips" id="ttc"></div><select id="tt" hidden></select><input id="tn" placeholder="توضیح (اختیاری)" autocomplete="off" style="margin-top:10px"><div class="two"><button class="btn" id="ts">انتقال</button><button class="btn s" id="tx2">بستن</button></div></div></div>
 <div class="bg" id="dbg"><div class="sheet" style="max-height:92vh"><h2>🏦 اقساط و بدهی</h2><div id="dlist"></div><div class="two"><button class="btn" id="dadd1">＋ قسط</button><button class="btn" id="dadd2">＋ بدهی / طلب</button></div><button class="btn s" id="dx" style="margin-top:10px;width:100%">بستن</button></div></div>
 <div class="bg" id="dfg"><div class="sheet" style="max-height:92vh"><h2 id="dft">قسط جدید</h2><div class="chips" id="dkc" style="margin-bottom:4px"></div>
   <div class="lbl">نام</div><input id="dn" autocomplete="off">
@@ -458,7 +458,7 @@ function vSet(){
   <div class="sgt">بکاپ</div><div class="sg">${(()=>{const lb=localStorage.getItem('bd-lastbk'),old=!lb||(D(today())-D(lb))/864e5>7;return row('icl','cl','#3b82f6','ارسال بکاپ به Files / iCloud',(lb?'آخرین بکاپ: '+jd(lb):'هنوز بکاپ نگرفتی')+(old?' · ⏰ وقت بکاپ جدیده':''),ch)})()}${row('ex','⬇','#9ccc65','ذخیره‌ی بکاپ','خروجی فایل JSON',ch)}${row('im','⬆','#4dd0e1','بازیابی از فایل','جایگزینی با فایل بکاپ',ch)}</div>
   <div class="sgt">ورود و خروج اطلاعات</div><div class="sg">${row('csv','📊','#ffd21f','خروجی اکسل (CSV)','همه‌ی تراکنش‌ها با تاریخ شمسی',ch)}${row('imcsv','📊','#2fe6d3','وارد کردن از اکسل (CSV)','تاریخ، نوع، دسته، حساب، مبلغ، توضیح',ch)}${row('impc','📥','#ff9f43','وارد کردن بکاپ CANdo','اطلاعات اپ مالی قبلی را اضافه کن',ch)}</div>
   <div class="sgt">منطقه‌ی خطر</div><div class="sg">${row('wipe','🗑','#ff5c7a','پاک کردن همه‌ی اطلاعات','تراکنش‌ها، حساب‌ها، دسته‌ها و بودجه‌ها','','dng')}</div>
-  <div class="msg" id="msg" style="text-align:center"></div><div class="empty" style="font-size:12px;padding:10px">اطلاعات فقط روی همین دستگاه ذخیره می‌شود.<br>نسخه‌ی 1.6.1</div>`;
+  <div class="msg" id="msg" style="text-align:center"></div><div class="empty" style="font-size:12px;padding:10px">اطلاعات فقط روی همین دستگاه ذخیره می‌شود.<br>نسخه‌ی 1.4</div>`;
 }
 let _pv='home';
 function render(){
@@ -558,6 +558,9 @@ function adSync(){const d=j2i(+$('ady').value,+$('adm').value,+$('add2').value),
 let JM='';
 function dsel(iso){const[y,m,d]=jp(iso),ty=jp(today())[0],ys=[...Array(7)].map((_,i)=>ty-5+i);if(!ys.includes(y)){ys.push(y);ys.sort()}
   $('ady').innerHTML=ys.map(v=>`<option${v===y?' selected':''}>${v}</option>`).join('');$('adm').innerHTML=MN.map((n,i)=>`<option value="${i+1}"${i+1===m?' selected':''}>${n}</option>`).join('');$('add2').innerHTML=Array.from({length:31},(_,i)=>`<option${i+1===d?' selected':''}>${i+1}</option>`).join('')}
+function dselT(iso){const[y,m,d]=jp(iso),ty=jp(today())[0],ys=[...Array(7)].map((_,i)=>ty-5+i);if(!ys.includes(y)){ys.push(y);ys.sort()}
+  $('tdy').innerHTML=ys.map(v=>`<option${v===y?' selected':''}>${v}</option>`).join('');$('tdm').innerHTML=MN.map((n,i)=>`<option value="${i+1}"${i+1===m?' selected':''}>${n}</option>`).join('');$('tdd').innerHTML=Array.from({length:31},(_,i)=>`<option${i+1===d?' selected':''}>${i+1}</option>`).join('')}
+function tdSync(){const d=j2i(+$('tdy').value,+$('tdm').value,+$('tdd').value),df=Math.round((D(d)-D(today()))/864e5),[y,m,dd]=jp(d),W=['یکشنبه','دوشنبه','سه‌شنبه','چهارشنبه','پنجشنبه','جمعه','شنبه'][D(d).getUTCDay()];document.querySelectorAll('#tdq [data-dq]').forEach(b=>b.classList.toggle('on',+b.dataset.dq===df));$('tdc').classList.toggle('on',df<-2||df>0);$('tdlbl').textContent=W+' '+dd+' '+MN[m-1]+(y!==jp(today())[0]?' '+y:'')}
 let KCB=null;
 function askC(msg,cb,info){KCB=cb;$('km').textContent=msg;$('ky').style.display=info?'none':'';$('kn').textContent=info?'باشه':'انصراف';$('kbg').classList.add('open')}
 $('ky').onclick=()=>{$('kbg').classList.remove('open');const c=KCB;KCB=null;if(c)c()};
@@ -703,11 +706,11 @@ $('cx').onclick=()=>$('cbg').classList.remove('open');
 $('cd').onclick=()=>askC('این دسته حذف شود؟ تراکنش‌هایش می‌مانند.',()=>{S.cats=S.cats.filter(c=>c.id!==E.id);save();$('cbg').classList.remove('open');render();mRender()});
 
 // ---- transfers
-function trOpen(am,fr){if(S.accs.length<2)return askC('برای انتقال حداقل دو حساب لازم است.',null,1);const o=S.accs.map(x=>`<option value="${x.id}">${esc(x.n)}</option>`).join('');$('tf').innerHTML=o;$('tt').innerHTML=o;if(fr)$('tf').value=fr;$('tt').value=(S.accs.find(x=>x.id!==$('tf').value)||{}).id;$('ta').value=am||'';$('tn').value='';trR();$('tbg').classList.add('open')}
+function trOpen(am,fr){if(S.accs.length<2)return askC('برای انتقال حداقل دو حساب لازم است.',null,1);const o=S.accs.map(x=>`<option value="${x.id}">${esc(x.n)}</option>`).join('');$('tf').innerHTML=o;$('tt').innerHTML=o;if(fr)$('tf').value=fr;$('tt').value=(S.accs.find(x=>x.id!==$('tf').value)||{}).id;$('ta').value=am||'';$('tn').value='';dselT(today());tdSync();trR();$('tbg').classList.add('open')}
 function trR(){['tf','tt'].forEach(k=>{const v=$(k).value,o=$(k==='tf'?'tt':'tf').value;$(k+'c').innerHTML=S.accs.map(x=>`<button class="chip${x.id===v?' on':''}" type="button" data-k="${k}" data-acc="${x.id}"${k==='tt'&&x.id===o?' disabled style="opacity:.35"':''}>${esc(x.n)}</button>`).join('')})}
 $('tfc').onclick=$('ttc').onclick=e=>{const b=e.target.closest('[data-acc]');if(!b||b.disabled)return;$(b.dataset.k).value=b.dataset.acc;if($('tf').value===$('tt').value)$('tt').value=(S.accs.find(x=>x.id!==$('tf').value)||{}).id;trR()};
 $('ta').oninput=()=>fmtIn($('ta'));
-$('ts').onclick=()=>{const a=num($('ta').value);if(!a||$('tf').value===$('tt').value)return;S.tx.push({id:Date.now().toString(36)+Math.random().toString(36).slice(2,5),d:today(),a,t:'tr',ac:$('tf').value,to:$('tt').value,c:'',n:$('tn').value.trim()});save();$('tbg').classList.remove('open');render()};
+$('ts').onclick=()=>{const a=num($('ta').value);if(!a||$('tf').value===$('tt').value)return;const d=j2i(+$('tdy').value,+$('tdm').value,+$('tdd').value);S.tx.push({id:Date.now().toString(36)+Math.random().toString(36).slice(2,5),d,a,t:'tr',ac:$('tf').value,to:$('tt').value,c:'',n:$('tn').value.trim()});save();$('tbg').classList.remove('open');render()};
 $('src').onclick=async()=>{const u=$('sru').value;try{await navigator.clipboard.writeText(u);$('src').textContent='✓ کپی شد'}catch(e){$('sru').select();document.execCommand&&document.execCommand('copy');$('src').textContent='✓ کپی شد'}setTimeout(()=>$('src').textContent='📋 کپی آدرس',1500)};
 $('srx').onclick=()=>$('srbg').classList.remove('open');$('srbg').addEventListener('click',e=>{if(e.target===$('srbg'))$('srbg').classList.remove('open')});
 $('tx2').onclick=()=>$('tbg').classList.remove('open');
@@ -752,16 +755,17 @@ function tagCard(){const m={};S.tx.forEach(x=>{if(x.t!=='out')return;tagsOf(x.n)
 
 // ---- date picker (Jalali calendar)
 let JV=A;
-function jcR(){const[y,m]=jp(JV),a=first(JV),off=(D(a).getUTCDay()+1)%7,SEL=JM==='add'?j2i(+$('ady').value,+$('adm').value,+$('add2').value):A,TD=new Set(S.tx.map(z=>z.d));{const[sy,sm,sd]=jp(SEL);$('jcsel').textContent=['یکشنبه','دوشنبه','سه‌شنبه','چهارشنبه','پنجشنبه','جمعه','شنبه'][D(SEL).getUTCDay()]+' '+sd+' '+MN[sm-1]+' '+sy}
+function jcR(){const[y,m]=jp(JV),a=first(JV),off=(D(a).getUTCDay()+1)%7,SEL=JM==='add'?j2i(+$('ady').value,+$('adm').value,+$('add2').value):JM==='tr'?j2i(+$('tdy').value,+$('tdm').value,+$('tdd').value):A,TD=new Set(S.tx.map(z=>z.d));{const[sy,sm,sd]=jp(SEL);$('jcsel').textContent=['یکشنبه','دوشنبه','سه‌شنبه','چهارشنبه','پنجشنبه','جمعه','شنبه'][D(SEL).getUTCDay()]+' '+sd+' '+MN[sm-1]+' '+sy}
   let h=['ش','ی','د','س','چ','پ','ج'].map((c,i)=>`<div class="wd${i===6?' fr':''}">${c}</div>`).join('')+'<div></div>'.repeat(off),x=a;
-  while(jp(x)[1]===m){h+=`<button class="jd${D(x).getUTCDay()===5?' fr':''}${TD.has(x)?' hx':''}${x===(JM==='add'?j2i(+$('ady').value,+$('adm').value,+$('add2').value):A)?' sel':''}${x===today()?' tod':''}" data-d="${x}">${jp(x)[2]}</button>`;x=add(x,1)}
+  while(jp(x)[1]===m){h+=`<button class="jd${D(x).getUTCDay()===5?' fr':''}${TD.has(x)?' hx':''}${x===(JM==='add'?j2i(+$('ady').value,+$('adm').value,+$('add2').value):JM==='tr'?j2i(+$('tdy').value,+$('tdm').value,+$('tdd').value):A)?' sel':''}${x===today()?' tod':''}" data-d="${x}">${jp(x)[2]}</button>`;x=add(x,1)}
   $('jcl').innerHTML=MN[m-1]+' <small>'+y+'</small>';$('jcgrid').innerHTML=h}
 $('adq').onclick=e=>{const q=e.target.closest('[data-dq]');if(q){dsel(add(today(),+q.dataset.dq));adSync();return}if(e.target.closest('#adc')){JM='add';JV=first(j2i(+$('ady').value,+$('adm').value,+$('add2').value));jcR();$('jcg').classList.add('open')}};
+$('tdq').onclick=e=>{const q=e.target.closest('[data-dq]');if(q){dselT(add(today(),+q.dataset.dq));tdSync();return}if(e.target.closest('#tdc')){JM='tr';JV=first(j2i(+$('tdy').value,+$('tdm').value,+$('tdd').value));jcR();$('jcg').classList.add('open')}};
 $('jcx').addEventListener('click',()=>JM='');
 $('dl').onclick=()=>{JM='';JV=first(A);jcR();$('jcg').classList.add('open')};
 $('jcp').onclick=()=>{JV=first(add(first(JV),-1));jcR()};$('jcn').onclick=()=>{JV=first(add(first(JV),32));jcR()};
-$('jcgrid').onclick=e=>{const b=e.target.closest('[data-d]');if(!b)return;if(JM==='add'){JM='';dsel(b.dataset.d);adSync();$('jcg').classList.remove('open');return}A=b.dataset.d;$('jcg').classList.remove('open');render()};
-$('jct').onclick=()=>{if(JM==='add'){JM='';dsel(today());adSync();$('jcg').classList.remove('open');return}A=today();$('jcg').classList.remove('open');render()};
+$('jcgrid').onclick=e=>{const b=e.target.closest('[data-d]');if(!b)return;if(JM==='add'){JM='';dsel(b.dataset.d);adSync();$('jcg').classList.remove('open');return}if(JM==='tr'){JM='';dselT(b.dataset.d);tdSync();$('jcg').classList.remove('open');return}A=b.dataset.d;$('jcg').classList.remove('open');render()};
+$('jct').onclick=()=>{if(JM==='add'){JM='';dsel(today());adSync();$('jcg').classList.remove('open');return}if(JM==='tr'){JM='';dselT(today());tdSync();$('jcg').classList.remove('open');return}A=today();$('jcg').classList.remove('open');render()};
 $('jcx').onclick=()=>$('jcg').classList.remove('open');
 $('jcg').addEventListener('click',e=>{if(e.target===$('jcg'))$('jcg').classList.remove('open')});
 
