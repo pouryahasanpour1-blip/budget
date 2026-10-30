@@ -612,7 +612,11 @@ function urlAdd(){let t=null,fs=false;try{const P_=new URLSearchParams(location.
   const sm=fs||t.length>25&&/برداشت|واریز|مانده|موجودی|ریال|بانک/.test(t),r=sm?(parseSms(t)||parseQ(t)):parseQ(t);
   if(!r){$('qbg').classList.add('open');$('qi').value=t;$('qm').textContent='مبلغ پیدا نشد؛ متن را اصلاح کن.';return}openAdd(r.id,r);if(r.sms)$('ah').textContent=f(r.a)+' '+S.u+' · از پیامک؛ قبل از ذخیره بررسی کن'}
 function dl(c,n,ty){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([c],{type:ty}));a.download=n;document.body.appendChild(a);a.click();a.remove()}
-$('fi').onchange=async e=>{const fl=e.target.files[0];if(!fl)return;try{const tx0=await fl.text(),o=JSON.parse(tx0);if(Array.isArray(o.items)&&!o.tx){$('cdt').value=tx0;$('cdm').textContent='این بکاپ CANdo است؛ «وارد کن» را بزن.';$('cdg').classList.add('open');return}if(!Array.isArray(o.tx)||!Array.isArray(o.cats))throw 0;askC('اطلاعات فعلی با فایل بکاپ جایگزین شود؟',()=>{S=Object.assign(mkS(),o);save();render();msg('بازیابی شد.')})}catch(x){msg('فایل بکاپ معتبر نیست.')}e.target.value=''};
+const RESTORE_COLS=[['tx','tx'],['acc','accs'],['cat','cats'],['sg','sg'],['rec','rec'],['dbt','dbt']];
+function restoreStamp(){let t=Math.max(Date.now()+1,+S.ts||0);Object.values(S.dl||{}).forEach(x=>{x=+x||0;if(x>=t)t=x+1});return t}
+function markRevived(k,id,t){if(id==null)return;S.rv=S.rv&&typeof S.rv==='object'?S.rv:{};S.dl=S.dl&&typeof S.dl==='object'?S.dl:{};const key=k+':'+id;S.rv[key]=Math.max(+S.rv[key]||0,t);if((+S.dl[key]||0)<=S.rv[key])delete S.dl[key]}
+function markRestoredState(){const t=restoreStamp();S.rv=S.rv&&typeof S.rv==='object'?S.rv:{};S.dl=S.dl&&typeof S.dl==='object'?S.dl:{};RESTORE_COLS.forEach(([k,a])=>(S[a]||[]).forEach(x=>markRevived(k,x.id,t)));S.budTs=t;S.goalTs=t;delete S.dl['bud:*'];delete S.dl['goal:*']}
+$('fi').onchange=async e=>{const fl=e.target.files[0];if(!fl)return;try{const tx0=await fl.text(),o=JSON.parse(tx0);if(Array.isArray(o.items)&&!o.tx){$('cdt').value=tx0;$('cdm').textContent='این بکاپ CANdo است؛ «وارد کن» را بزن.';$('cdg').classList.add('open');return}if(!Array.isArray(o.tx)||!Array.isArray(o.cats))throw 0;askC('اطلاعات فعلی با فایل بکاپ جایگزین شود؟',()=>{S=Object.assign(mkS(),o);markRestoredState();save();render();msg('بازیابی شد.')})}catch(x){msg('فایل بکاپ معتبر نیست.')}e.target.value=''};
 
 // ---- Jalali date helpers
 const key=a=>a[0]*400+a[1]*32+a[2],jd=s=>{const j=jp(s);return j[0]+'/'+String(j[1]).padStart(2,'0')+'/'+String(j[2]).padStart(2,'0')};
@@ -835,19 +839,23 @@ $('jcg').addEventListener('click',e=>{if(e.target===$('jcg'))$('jcg').classList.
 // ---- import CANdo backup
 const dOut=[['🍽','خوراک'],['🚕','حمل‌ونقل'],['🏠','خانه'],['🛍','خرید'],['💊','سلامت'],['🎬','سرگرمی'],['📦','سایر']],dIn=[['💼','حقوق'],['💰','پروژه'],['🎁','هدیه'],['📈','سرمایه‌گذاری'],['📦','سایر']];
 function importCando(o){
-  const mc={},ma={};let nt=0,nc=0,na=0,ng=0,nr=0;
+  const mc={},ma={},rt=restoreStamp();let nt=0,nc=0,na=0,ng=0,nr=0,budgetTouched=false,goalTouched=false;S.dl=S.dl||{};S.rv=S.rv||{};
   ['out','in'].forEach(t=>{const L=o.cats&&Array.isArray(o.cats[t])&&o.cats[t].length?o.cats[t]:(t==='out'?dOut:dIn).map((c,i)=>({id:i,e:c[0],n:c[1]}));
     L.forEach((c,i)=>{if(!c||!c.n)return;let x=S.cats.find(y=>y.t===t&&y.n===c.n);if(!x){x={id:'c'+Date.now().toString(36)+t[0]+i,n:c.n,e:c.e||'🏷',c:PAL[S.cats.length%9],t,z:'m'};S.cats.push(x);nc++}mc[t+c.id]=x.id})});
+  Object.values(mc).forEach(id=>markRevived('cat',id,rt));
   const fb=t=>{const x=S.cats.find(y=>y.t===t&&y.n==='سایر')||S.cats.find(y=>y.t===t);return x&&x.id};
   (Array.isArray(o.accs)&&o.accs.length?o.accs:[{id:0,n:'نقد'},{id:1,n:'کارت'}]).forEach(a=>{if(!a||!a.n)return;let x=S.accs.find(y=>y.n===a.n);if(!x){x={id:'a'+Date.now().toString(36)+a.id,n:a.n,b:0};S.accs.push(x);na++}ma[a.id]=x.id});
+  Object.values(ma).forEach(id=>markRevived('acc',id,rt));
   const A0=v=>ma[v==null?0:v]||S.accs[0].id;
-  (o.items||[]).forEach(x=>{if(!x||!(x.a>0)||!x.d||!['in','out','tr'].includes(x.t)||(x.t==='tr'&&x.to==null))return;const id='cd'+x.id;if(S.tx.some(y=>y.id===id))return;
-    const t={id,d:x.d,a:x.a,t:x.t,c:x.t==='tr'?'':(mc[x.t+x.c]||fb(x.t)),ac:A0(x.ac),n:x.n||''};if(x.t==='tr')t.to=A0(x.to);S.tx.push(t);nt++});
-  if(o.cbud)Object.keys(o.cbud).forEach(k=>{const id=mc['out'+k];if(id&&!S.bud[id])S.bud[id]=o.cbud[k]});
-  if(o.cgoal)Object.keys(o.cgoal).forEach(k=>{const id=mc['in'+k];S.goal=S.goal||{};if(id&&!S.goal[id])S.goal[id]=o.cgoal[k]});
-  if(+o.budget&&!S.mb)S.mb=+o.budget;
-  (o.sgoals||[]).forEach(g=>{if(!g||!g.n||!(g.t>=0))return;const id='cd'+g.id;S.sg=S.sg||[];if(S.sg.some(y=>y.id===id))return;S.sg.push({id,n:g.n,target:g.t||1,saved:g.s||0});ng++});
-  (o.recs||[]).forEach(r=>{if(!r||!(r.a>0)||!r.day||!r.last)return;const id='cd'+r.id;S.rec=S.rec||[];if(S.rec.some(y=>y.id===id))return;S.rec.push({id,t:r.t,c:mc[r.t+r.c]||fb(r.t),a:r.a,ac:A0(r.ac),n:r.n||'',day:r.day,last:j2i(Math.floor(r.last/100),r.last%100,1)});nr++});
+  (o.items||[]).forEach(x=>{if(!x||!(x.a>0)||!x.d||!['in','out','tr'].includes(x.t)||(x.t==='tr'&&x.to==null))return;const id='cd'+x.id;if(S.tx.some(y=>y.id===id)){markRevived('tx',id,rt);return}
+    const t={id,d:x.d,a:x.a,t:x.t,c:x.t==='tr'?'':(mc[x.t+x.c]||fb(x.t)),ac:A0(x.ac),n:x.n||''};if(x.t==='tr')t.to=A0(x.to);S.tx.push(t);markRevived('tx',id,rt);nt++});
+  if(o.cbud)Object.keys(o.cbud).forEach(k=>{const id=mc['out'+k];if(!id)return;budgetTouched=true;if(!S.bud[id])S.bud[id]=o.cbud[k]});
+  if(o.cgoal)Object.keys(o.cgoal).forEach(k=>{const id=mc['in'+k];if(!id)return;goalTouched=true;S.goal=S.goal||{};if(!S.goal[id])S.goal[id]=o.cgoal[k]});
+  if(+o.budget){budgetTouched=true;if(!S.mb)S.mb=+o.budget}
+  if(budgetTouched){S.budTs=Math.max(+S.budTs||0,rt);delete S.dl['bud:*']}
+  if(goalTouched){S.goalTs=Math.max(+S.goalTs||0,rt);delete S.dl['goal:*']}
+  (o.sgoals||[]).forEach(g=>{if(!g||!g.n||!(g.t>=0))return;const id='cd'+g.id;S.sg=S.sg||[];if(S.sg.some(y=>y.id===id)){markRevived('sg',id,rt);return}S.sg.push({id,n:g.n,target:g.t||1,saved:g.s||0});markRevived('sg',id,rt);ng++});
+  (o.recs||[]).forEach(r=>{if(!r||!(r.a>0)||!r.day||!r.last)return;const id='cd'+r.id;S.rec=S.rec||[];if(S.rec.some(y=>y.id===id)){markRevived('rec',id,rt);return}S.rec.push({id,t:r.t,c:mc[r.t+r.c]||fb(r.t),a:r.a,ac:A0(r.ac),n:r.n||'',day:r.day,last:j2i(Math.floor(r.last/100),r.last%100,1)});markRevived('rec',id,rt);nr++});
   save();render();
   return nt+' تراکنش، '+nc+' دسته‌ی جدید، '+na+' حساب جدید، '+ng+' هدف پس‌انداز و '+nr+' تراکنش تکراری اضافه شد.'}
 $('cdf').onclick=()=>$('fi2').click();
