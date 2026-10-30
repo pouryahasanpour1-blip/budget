@@ -231,6 +231,9 @@ svg.lic{width:58%;height:58%;fill:none;stroke:currentColor;stroke-width:1.7;stro
 /* هدف پس‌انداز */
 .gd{display:flex;justify-content:space-between;font-size:12.5px;color:var(--mute);margin-top:8px;gap:8px;flex-wrap:wrap}
 .gd b{color:var(--txt);font-weight:700;font-size:13px}
+.wopt{display:flex;align-items:center;gap:12px;padding:12px 14px;margin-top:8px;border-radius:16px;background:var(--card);cursor:pointer;text-align:right}
+.wopt input{width:20px;height:20px;flex:none;accent-color:var(--y)}
+.wopt span{min-width:0}.wopt b{display:block;font-size:13.5px}.wopt small{display:block;color:var(--mute);font-size:11.5px;margin-top:2px;line-height:1.7}
 @media (min-width:900px){
   body{max-width:1240px;padding:24px 24px 124px}
   .top{flex-direction:row!important;align-items:center;gap:16px;padding:12px 16px;margin-bottom:18px}
@@ -319,6 +322,7 @@ svg.lic{width:58%;height:58%;fill:none;stroke:currentColor;stroke-width:1.7;stro
 <input type="file" id="fi2" accept=".json,application/json,text/plain" hidden>
 <div class="bg" id="swg"><div class="sheet"><h2>این تراکنش</h2><button class="btn" id="swc" style="margin-bottom:8px">📋 کپی با تاریخ امروز</button><button class="btn" id="swd" style="background:var(--neg);color:#fff;margin-bottom:8px">🗑 حذف</button><button class="btn s" id="swx">انصراف</button></div></div>
 <div class="bg" id="kbg"><div class="sheet"><h2>تأیید</h2><div id="km" style="font-size:15px;line-height:1.9;margin-bottom:6px"></div><div class="two"><button class="btn" id="ky" style="background:var(--neg);color:#fff">بله</button><button class="btn s" id="kn">انصراف</button></div></div></div>
+<div class="bg" id="wipeBg"><div class="sheet" style="max-height:92vh;overflow:auto"><h2>🗑 انتخاب موارد برای پاک‌کردن</h2><div class="hint" style="text-align:right;line-height:1.9">فقط گزینه‌های انتخاب‌شده پاک می‌شوند. برای نهایی‌کردن، یک‌بار دیگر تأیید می‌گیریم.</div><label class="wopt"><input type="checkbox" id="wipeAll"><span><b>انتخاب همهٔ اطلاعات مالی</b><small>تنظیمات ظاهر، قفل و ورود همگام‌سازی پاک نمی‌شوند.</small></span></label><div id="wipeOpts"></div><div class="hint" style="text-align:right;line-height:1.8;font-size:12px;margin-top:10px">اگر تراکنش‌ها را نگه داری، مواردی که به حساب یا دستهٔ حذف‌شده وابسته‌اند باقی می‌مانند و ممکن است «نامشخص» نمایش داده شوند.</div><div class="two"><button class="btn" id="wipeNext" disabled>ادامه و تأیید</button><button class="btn s" id="wipeCancel">انصراف</button></div></div></div>
 
 <!-- شیت هدف پس‌انداز -->
 <div class="bg" id="gbg"><div class="sheet">
@@ -506,6 +510,36 @@ $('pv').onclick=()=>nav(-1);$('nx').onclick=()=>nav(1);
 $('md').onchange=()=>{S.mode=$('md').value;save();render()};
 $('seg').onclick=e=>{const b=e.target.closest('[data-m]');if(!b)return;S.mode=b.dataset.m;save();render()};
 const msg=t=>{const m=$('msg');if(m)m.textContent=t};
+const WIPE_ITEMS=[
+  {k:'tx',n:'تراکنش‌ها و انتقال‌ها',d:()=>`${f((S.tx||[]).length)} مورد ثبت‌شده`},
+  {k:'accs',n:'حساب‌ها',d:()=>`${f((S.accs||[]).length)} حساب؛ حساب‌های پیش‌فرض بازگردانده می‌شوند`},
+  {k:'cats',n:'دسته‌ها',d:()=>`${f((S.cats||[]).length)} دسته؛ بودجه و هدف‌های درآمدی وابسته هم پاک می‌شوند`},
+  {k:'bud',n:'بودجه و هدف‌های درآمدی',d:()=>`${f(Object.keys(S.bud||{}).length+Object.keys(S.goal||{}).length+(S.mb!==undefined?1:0)+(S.mg!==undefined?1:0))} تنظیم`},
+  {k:'sg',n:'اهداف پس‌انداز',d:()=>`${f((S.sg||[]).length)} هدف`},
+  {k:'rec',n:'تراکنش‌های تکراری',d:()=>`${f((S.rec||[]).length)} مورد`},
+  {k:'dbt',n:'اقساط و بدهی‌ها',d:()=>`${f((S.dbt||[]).length)} مورد`}
+];
+function wipeOpen(){
+  $('wipeOpts').innerHTML=WIPE_ITEMS.map(o=>`<label class="wopt"><input type="checkbox" data-wipe="${o.k}"><span><b>${o.n}</b><small>${o.d()}</small></span></label>`).join('');
+  $('wipeAll').checked=false;$('wipeAll').indeterminate=false;$('wipeNext').disabled=true;$('wipeBg').classList.add('open');
+}
+function wipeState(){const a=$('wipeOpts').querySelectorAll('[data-wipe]'),c=$('wipeOpts').querySelectorAll('[data-wipe]:checked');$('wipeAll').checked=a.length>0&&a.length===c.length;$('wipeAll').indeterminate=c.length>0&&c.length<a.length;$('wipeNext').disabled=!c.length}
+function wipeApply(keys){
+  const pick=new Set(keys),d=mkS(),stamp=Date.now();
+  if(pick.has('tx')){S.tx=[];S.alerts={};BR=null;CS=null;SP=0;FA='';TG=''}
+  if(pick.has('accs')){S.accs=d.accs.map((x,i)=>({...x,id:'a'+stamp+'-'+i}));FA=''}
+  if(pick.has('cats'))S.cats=d.cats.map((x,i)=>({...x,id:'c'+stamp+'-'+i}));
+  if(pick.has('bud')||pick.has('cats')){S.bud={};S.goal={};delete S.mb;delete S.mg;S.dl=S.dl||{};S.dl['bud:*']=stamp;S.dl['goal:*']=stamp;S.budTs=stamp;S.goalTs=stamp}
+  if(pick.has('sg'))S.sg=[];
+  if(pick.has('rec'))S.rec=[];
+  if(pick.has('dbt'))S.dbt=[];
+  save();render();msg('موارد انتخاب‌شده پاک شدند.');
+}
+$('wipeAll').onchange=()=>{$('wipeOpts').querySelectorAll('[data-wipe]').forEach(x=>x.checked=$('wipeAll').checked);wipeState()};
+$('wipeOpts').onchange=wipeState;
+$('wipeCancel').onclick=()=>$('wipeBg').classList.remove('open');
+$('wipeBg').onclick=e=>{if(e.target===$('wipeBg'))$('wipeBg').classList.remove('open')};
+$('wipeNext').onclick=()=>{const keys=[...$('wipeOpts').querySelectorAll('[data-wipe]:checked')].map(x=>x.dataset.wipe);if(!keys.length)return;const names=keys.map(k=>WIPE_ITEMS.find(x=>x.k===k).n),extra=keys.includes('cats')&&!keys.includes('bud')?' بودجه و هدف‌های درآمدی هم به‌دلیل وابستگی پاک می‌شوند.':'';$('wipeBg').classList.remove('open');askC('این موارد پاک شوند؟ '+names.join('، ')+'.'+extra+' این کار قابل بازگشت نیست.',()=>wipeApply(keys))};
 $('view').oninput=e=>{if(e.target.id==='q'){Q=e.target.value;$('txl').innerHTML=list()}};
 $('view').onclick=e=>{const b=e.target.closest('[data-act]');if(!b)return;const a=b.dataset.act,id=b.dataset.id,t=b.dataset.t,v=b.dataset.v;if(a==='swdel'){const x=S.tx.find(y=>y.id===id);if(x)askC('این تراکنش حذف شود؟',()=>{S.tx=S.tx.filter(y=>y!==x);save();render()});swClose();return}
 if(a==='swcp'){const x=S.tx.find(y=>y.id===id);if(x){S.tx.push(Object.assign(JSON.parse(JSON.stringify(x)),{id:uid(),d:today()}));save();render()}return}
@@ -560,7 +594,7 @@ else if(a==='edtx'){const x=S.tx.find(y=>y.id===id);if(!x)return;if(x.t==='tr')a
   else if(a==='impc'){$('cdt').value='';$('cdm').textContent='';$('cdg').classList.add('open')}
   else if(a==='imcsv')$('ficsv').click();
   else if(a==='csv'){const rows=[['تاریخ','نوع','دسته','حساب','مبلغ','توضیح'],...S.tx.slice().sort((p,q)=>p.d.localeCompare(q.d)).map(x=>[jd(x.d),x.t==='tr'?'انتقال':x.t==='in'?'درآمد':'هزینه',x.t==='tr'?'':cat(x.c).n,accN(x.ac),x.a,x.n||''])];dl('\ufeff'+rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n'),'transactions-'+today()+'.csv','text/csv');msg('فایل ساخته شد.')}
-  else if(a==='wipe')askC('همه‌ی اطلاعات (تراکنش‌ها، حساب‌ها، دسته‌ها و بودجه‌ها) پاک شود؟ این کار قابل بازگشت نیست.',()=>{try{localStorage.removeItem(SK)}catch(e){}S=mkS();A=today();Q='';save();render();msg('همه‌ی اطلاعات پاک شد.')});
+  else if(a==='wipe')wipeOpen();
 };
 function budAlert(cid,d){if(S.balert===false)return;const b=S.bud[cid];if(!b)return;const t=today(),m0=first(t),m1=first(add(m0,32));if(d<m0||d>=m1)return;
   const sp=S.tx.reduce((s,x)=>s+(x.t==='out'&&x.c===cid&&x.d>=m0&&x.d<m1?x.a:0),0),lv=sp>=b?100:sp>=b*.8?80:0;if(!lv)return;S.alerts=S.alerts||{};const k=m0+'|'+cid+'|'+lv;if(S.alerts[k])return;S.alerts[k]=1;if(lv===100)S.alerts[m0+'|'+cid+'|80']=1;save();
