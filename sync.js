@@ -25,8 +25,8 @@ function snap(){COLS.forEach(([k,a])=>known[k]=new Set((S[a]||[]).map(x=>x.id)))
 function trackDel(){
   S.dl=S.dl||{};const n=Date.now();
   COLS.forEach(([k,a])=>{const cur=new Set((S[a]||[]).map(x=>x.id));known[k].forEach(id=>{if(!cur.has(id))S.dl[k+':'+id]=n});known[k]=cur});
-  if(known.bud!==bState()){const m=S.dl['bud:*'];if(m&&!Object.keys(S.bud||{}).length&&S.mb===undefined)S.budTs=Math.max(S.budTs||0,m);else{S.budTs=n;delete S.dl['bud:*']}known.bud=bState()}
-  if(known.goal!==gState()){const m=S.dl['goal:*'];if(m&&!Object.keys(S.goal||{}).length&&S.mg===undefined)S.goalTs=Math.max(S.goalTs||0,m);else{S.goalTs=n;delete S.dl['goal:*']}known.goal=gState()}
+  if(known.bud!==bState()){const m=S.dl['bud:*'];if(m&&!Object.keys(S.bud||{}).length&&S.mb===undefined)S.budTs=Math.max(S.budTs||0,m);else{S.budTs=Math.max(n,S.budTs||0);delete S.dl['bud:*']}known.bud=bState()}
+  if(known.goal!==gState()){const m=S.dl['goal:*'];if(m&&!Object.keys(S.goal||{}).length&&S.mg===undefined)S.goalTs=Math.max(S.goalTs||0,m);else{S.goalTs=Math.max(n,S.goalTs||0);delete S.dl['goal:*']}known.goal=gState()}
   const cut=n-90*864e5;Object.keys(S.dl).forEach(x=>{if(!x.endsWith(':*')&&S.dl[x]<cut)delete S.dl[x]});
 }
 Storage.prototype.setItem=function(k,v){
@@ -40,7 +40,7 @@ Storage.prototype.setItem=function(k,v){
 /* ---------- داده‌ی قابل ارسال ---------- */
 const strip=o=>{const y=Object.assign({},o);delete y.img;return y};
 function payload(){
-  const p={v:1,ts:S.ts||0,dl:S.dl||{}};
+  const p={v:1,ts:S.ts||0,dl:S.dl||{},rv:S.rv||{}};
   COLS.forEach(([k,a])=>p[a]=(S[a]||[]).map(strip));
   MAPS.forEach(m=>{if(S[m]!==undefined)p[m]=S[m]});
   p.budTs=S.budTs||0;p.goalTs=S.goalTs||0;
@@ -54,17 +54,21 @@ function merge(r){
   const rn=(r.ts||0)>(S.ts||0);
   const dl=Object.assign({},S.dl||{});
   Object.entries(r.dl||{}).forEach(([k,t])=>{dl[k]=Math.max(dl[k]||0,t)});
+  const rv=Object.assign({},S.rv||{});
+  Object.entries(r.rv||{}).forEach(([k,t])=>{rv[k]=Math.max(rv[k]||0,t)});
   COLS.forEach(([k,a])=>{
     const L=S[a]||[],R=r[a]||[],lm=new Map(L.map(x=>[x.id,x])),rm=new Map(R.map(x=>[x.id,x]));
     const pick=id=>{
       const l=lm.get(id),x=rm.get(id);
       if(!x)return l;if(!l)return x;
+      const key=k+':'+id,lr=(S.rv||{})[key]||0,rr=(r.rv||{})[key]||0;
+      if(lr>rr)return l;if(rr>lr)return x;
       if(canon(strip(l))===canon(strip(x)))return l;
       if(rn){const y=strip(x);if(l.img)y.img=l.img;return y}
       return l;
     };
     const ids=rn?[...R.map(x=>x.id),...L.map(x=>x.id).filter(id=>!rm.has(id))]:[...L.map(x=>x.id),...R.map(x=>x.id).filter(id=>!lm.has(id))];
-    S[a]=ids.filter(id=>!dl[k+':'+id]).map(pick);
+    S[a]=ids.filter(id=>{const key=k+':'+id;return !dl[key]||(rv[key]||0)>dl[key]}).map(pick);
   });
   const group=(name,total)=>{
     const key=name+':*',lm=(S.dl||{})[key]||0,rm=(r.dl||{})[key]||0,mark=Math.max(lm,rm),lt=S[name+'Ts']||0,rt=r[name+'Ts']||0;
@@ -79,7 +83,8 @@ function merge(r){
     if(r[m]===undefined)return;
     S[m]=r[m];
   });
-  S.dl=dl;S.ts=Math.max(S.ts||0,r.ts||0);
+  Object.keys(dl).forEach(k=>{if((rv[k]||0)>dl[k])delete dl[k]});
+  S.rv=rv;S.dl=dl;S.ts=Math.max(S.ts||0,r.ts||0);
 }
 
 /* ---------- رمزنگاری اختیاری ---------- */
