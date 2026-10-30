@@ -20,11 +20,14 @@ let rev=null,pulled=false,busy=false,again=false,applying=false,lastHash=null,ti
 
 /* ---------- ردیابی حذف‌ها (tombstone) ---------- */
 const known={};
-function snap(){COLS.forEach(([k,a])=>known[k]=new Set((S[a]||[]).map(x=>x.id)))}
+const bState=()=>JSON.stringify([S.bud||{},S.mb]),gState=()=>JSON.stringify([S.goal||{},S.mg]);
+function snap(){COLS.forEach(([k,a])=>known[k]=new Set((S[a]||[]).map(x=>x.id)));known.bud=bState();known.goal=gState();if(S.budTs===undefined)S.budTs=0;if(S.goalTs===undefined)S.goalTs=0}
 function trackDel(){
   S.dl=S.dl||{};const n=Date.now();
   COLS.forEach(([k,a])=>{const cur=new Set((S[a]||[]).map(x=>x.id));known[k].forEach(id=>{if(!cur.has(id))S.dl[k+':'+id]=n});known[k]=cur});
-  const cut=n-90*864e5;Object.keys(S.dl).forEach(x=>{if(S.dl[x]<cut)delete S.dl[x]});
+  if(known.bud!==bState()){const m=S.dl['bud:*'];if(m&&!Object.keys(S.bud||{}).length&&S.mb===undefined)S.budTs=Math.max(S.budTs||0,m);else{S.budTs=n;delete S.dl['bud:*']}known.bud=bState()}
+  if(known.goal!==gState()){const m=S.dl['goal:*'];if(m&&!Object.keys(S.goal||{}).length&&S.mg===undefined)S.goalTs=Math.max(S.goalTs||0,m);else{S.goalTs=n;delete S.dl['goal:*']}known.goal=gState()}
+  const cut=n-90*864e5;Object.keys(S.dl).forEach(x=>{if(!x.endsWith(':*')&&S.dl[x]<cut)delete S.dl[x]});
 }
 Storage.prototype.setItem=function(k,v){
   if(this===localStorage&&k===SKEY&&!applying){
@@ -40,6 +43,7 @@ function payload(){
   const p={v:1,ts:S.ts||0,dl:S.dl||{}};
   COLS.forEach(([k,a])=>p[a]=(S[a]||[]).map(strip));
   MAPS.forEach(m=>{if(S[m]!==undefined)p[m]=S[m]});
+  p.budTs=S.budTs||0;p.goalTs=S.goalTs||0;
   return p;
 }
 const canon=o=>Array.isArray(o)?'['+o.map(canon).join(',')+']':o&&typeof o==='object'?'{'+Object.keys(o).sort().map(k=>JSON.stringify(k)+':'+canon(o[k])).join(',')+'}':JSON.stringify(o);
@@ -62,12 +66,18 @@ function merge(r){
     const ids=rn?[...R.map(x=>x.id),...L.map(x=>x.id).filter(id=>!rm.has(id))]:[...L.map(x=>x.id),...R.map(x=>x.id).filter(id=>!lm.has(id))];
     S[a]=ids.filter(id=>!dl[k+':'+id]).map(pick);
   });
-  if(rn)MAPS.forEach(m=>{
+  const group=(name,total)=>{
+    const key=name+':*',lm=(S.dl||{})[key]||0,rm=(r.dl||{})[key]||0,mark=Math.max(lm,rm),lt=S[name+'Ts']||0,rt=r[name+'Ts']||0;
+    if(mark&&lt<=mark&&rt<=mark){S[name]={};delete S[total];S[name+'Ts']=mark;dl[key]=mark;return}
+    if(mark){delete dl[key];const takeRemote=rt>lt,src=takeRemote?r[name]:S[name],val=takeRemote?r[total]:S[total];S[name]=Object.assign({},src||{});if(val===undefined)delete S[total];else S[total]=val;S[name+'Ts']=Math.max(lt,rt);return}
+    delete dl[key];const L=S[name]||{},R=r[name]||{},remoteWins=rt>lt;S[name]=Object.assign({},L,R,remoteWins?R:L);
+    if(remoteWins&&r[total]!==undefined)S[total]=r[total];else if(S[total]===undefined&&r[total]!==undefined)S[total]=r[total];
+    S[name+'Ts']=Math.max(lt,rt);
+  };
+  group('bud','mb');group('goal','mg');
+  if(rn)MAPS.filter(m=>!['bud','goal','mb','mg'].includes(m)).forEach(m=>{
     if(r[m]===undefined)return;
-    const remote=r[m],local=S[m];
-    if((m==='bud'||m==='goal')&&remote&&typeof remote==='object'&&!Array.isArray(remote)){
-      S[m]=Object.assign({},local&&typeof local==='object'&&!Array.isArray(local)?local:{},remote);
-    }else S[m]=remote;
+    S[m]=r[m];
   });
   S.dl=dl;S.ts=Math.max(S.ts||0,r.ts||0);
 }
