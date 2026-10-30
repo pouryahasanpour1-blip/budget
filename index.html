@@ -231,6 +231,35 @@ svg.lic{width:58%;height:58%;fill:none;stroke:currentColor;stroke-width:1.7;stro
 /* هدف پس‌انداز */
 .gd{display:flex;justify-content:space-between;font-size:12.5px;color:var(--mute);margin-top:8px;gap:8px;flex-wrap:wrap}
 .gd b{color:var(--txt);font-weight:700;font-size:13px}
+@media (min-width:900px){
+  body{max-width:1240px;padding:24px 24px 124px}
+  .top{flex-direction:row!important;align-items:center;gap:16px;padding:12px 16px;margin-bottom:18px}
+  .top .seg{flex:0 1 280px}
+  .top .nv{flex:1;max-width:460px;margin-inline:auto}
+  .top .nv .dlb{flex:1}
+  #view{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:14px;align-items:start}
+  #view>*{grid-column:1/-1;min-width:0}
+  #view>.hero{grid-column:span 5}
+  #view:has(.hero):not(:has(.card))>.hero{grid-column:1/-1;max-width:860px;width:100%;justify-self:center}
+  #view:has(.hero)>.card{grid-column:span 7}
+  #view>.grid{grid-template-columns:repeat(6,minmax(0,1fr));gap:12px}
+  #view>.grid>.tile,#view>.grid>.spair{height:156px}
+  #view>.sh{margin:18px 2px 0}
+  #view #txl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 12px}
+  #txl .dh{grid-column:1/-1}
+  #txl .swp{min-width:0}
+  #view>.card[data-act=mb],#view>.card[data-act=mg],#view>.row,#view>.btn{grid-column:span 6}
+  #view>.lbl,#view>.empty,#view>.sgt,#view>.sg,#view>.msg{grid-column:1/-1}
+  #tabs{width:min(600px,calc(100% - 48px));bottom:18px;padding:8px}
+  #tabs button{padding:12px 4px 10px}
+  #tabs button small{font-size:12px}
+  #tabs button svg{width:24px;height:24px}
+  .qk{right:max(28px,calc((100vw - 1240px)/2 + 28px));bottom:26px}
+  .bg{align-items:center;padding:24px}
+  .sheet{max-width:680px;max-height:88vh;border-radius:26px;padding:22px}
+  .ash{max-width:560px}
+  #csh{max-width:820px}
+}
 </style>
 </head>
 <body>
