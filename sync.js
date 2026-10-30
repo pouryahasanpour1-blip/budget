@@ -62,7 +62,13 @@ function merge(r){
     const ids=rn?[...R.map(x=>x.id),...L.map(x=>x.id).filter(id=>!rm.has(id))]:[...L.map(x=>x.id),...R.map(x=>x.id).filter(id=>!lm.has(id))];
     S[a]=ids.filter(id=>!dl[k+':'+id]).map(pick);
   });
-  if(rn)MAPS.forEach(m=>{if(r[m]!==undefined)S[m]=r[m];else delete S[m]});
+  if(rn)MAPS.forEach(m=>{
+    if(r[m]===undefined)return;
+    const remote=r[m],local=S[m];
+    if((m==='bud'||m==='goal')&&remote&&typeof remote==='object'&&!Array.isArray(remote)){
+      S[m]=Object.assign({},local&&typeof local==='object'&&!Array.isArray(local)?local:{},remote);
+    }else S[m]=remote;
+  });
   S.dl=dl;S.ts=Math.max(S.ts||0,r.ts||0);
 }
 
