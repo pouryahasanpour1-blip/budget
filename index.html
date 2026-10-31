@@ -290,6 +290,65 @@ svg.lic{width:58%;height:58%;fill:none;stroke:currentColor;stroke-width:1.7;stro
   .card[data-act]:hover{box-shadow:inset 0 0 0 1px var(--line)}
 }
 @media (min-width:1024px) and (prefers-reduced-motion:reduce){.tile:hover{transform:none}}
+/* Desktop redesign (v1.6) — laptop only, same theme colors */
+@media (min-width:1024px){
+  #tabs{background:var(--card);padding-top:140px}
+  #tabs::before{top:28px;right:24px;font-size:26px}
+  #tabs button{color:var(--mute);position:relative}
+  #tabs button.on{background:color-mix(in srgb,var(--y) 14%,transparent);color:var(--y);box-shadow:none;font-weight:800}
+  #tabs button.on::before{content:"";position:absolute;inset-inline-start:-16px;top:10px;bottom:10px;width:4px;border-radius:4px 0 0 4px;background:var(--g)}
+  #tabs::after{content:"میانبر: ثبت سریع با N و تب‌ها با ۱ تا ۵";display:block;font-size:11px;color:var(--mute);padding:12px 14px 0;margin-top:8px;border-top:1px solid var(--line);opacity:.8}
+  .qk,html .qk{top:80px;box-shadow:0 10px 24px -12px var(--y)}
+  .top{background:color-mix(in srgb,var(--card) 90%,transparent);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
+  .top .seg{flex:0 0 300px}
+  /* Home: one summary strip, then compact category tiles */
+  #view>.hero,#view:has(.hero):not(:has(.card))>.hero{grid-column:1/-1;max-width:none;display:grid;grid-template-columns:1.6fr 1fr 1fr;gap:14px;margin-bottom:4px}
+  .hero .hio{display:contents}
+  .hero .hn{padding:20px 24px;display:flex;flex-direction:column;justify-content:center}
+  .hero .hn b{font-size:36px}
+  .hero .hi{padding:18px;border-radius:24px;gap:14px}
+  .hero .hi i{width:46px;height:46px;border-radius:15px}
+  .hero .hi b{font-size:20px}.hero .hi small{font-size:12.5px}
+  .hero button:hover{box-shadow:inset 0 0 0 1px var(--line)}
+  #view>.sh{margin:10px 2px -2px;padding:0 4px}
+  #view>.grid>.tile,#view>.grid>.spair{height:136px}
+  #view>.tw{grid-column:1/-1}
+  /* Charts never grow taller than the screen */
+  #view .card>svg{max-height:300px}
+  #view .card{border:1px solid color-mix(in srgb,var(--line) 70%,transparent)}
+  /* Transactions: list on the right, chart pinned on the left */
+  #view:has(>#txl)>.card{grid-column:8/-1;grid-row:1/span 4;position:sticky;top:104px;margin:0}
+  #view:has(>#txl)>.srch,#view:has(>#txl)>.chips,#view:has(>#txl)>#txl{grid-column:1/8}
+  #view:has(>#txl)>.srch{margin:0}
+  #view #txl{display:block}
+  #txl .swp:hover>.row{background:color-mix(in srgb,var(--txt) 4%,var(--card))}
+  /* Accounts and reports */
+  #view>.row[data-act=delacc]{grid-column:span 4;margin:0}
+  #view>.card{margin:0}
+  #view:has(>.row[data-act=delacc])>.card:not(:first-child){grid-column:span 6}
+  #view:has(>.row[data-act=delacc])>.card:has(>.chips){grid-column:1/-1}
+  #view>div.row{grid-column:span 4;margin:0}
+  #view>.btn{margin:0}
+  #view>.btn[data-act=sgadd],#view>.btn[data-act=rimg]{grid-column:1/-1;max-width:420px;justify-self:start;width:100%}
+  /* Budget */
+  #view>.card[data-act=mb],#view>.card[data-act=mg]{grid-column:1/-1}
+  #view>.row[data-act=bud],#view>.row[data-act=goal]{margin:0}
+  #view>.row[data-act]:hover,#view>.card[data-act]:hover{box-shadow:inset 0 0 0 1px var(--line)}
+  /* Settings: two columns of groups */
+  #view:has(>.sg){grid-template-columns:1fr 1fr;grid-auto-flow:row dense;column-gap:20px;row-gap:0;max-width:1100px}
+  #view:has(>.sg)>.sgt:nth-child(4n+1),#view:has(>.sg)>.sg:nth-child(4n+2){grid-column:1}
+  #view:has(>.sg)>.sgt:nth-child(4n+3),#view:has(>.sg)>.sg:nth-child(4n){grid-column:2}
+  #view:has(>.sg)>.sg{align-self:start;margin-bottom:6px}
+  #view:has(>.sg)>.sgt{margin:22px 6px 10px!important;align-self:end}
+  #view:has(>.sg)>.msg,#view:has(>.sg)>.empty{grid-column:1/-1}
+  .srow:hover{background:color-mix(in srgb,var(--txt) 5%,transparent)}
+  /* Sheets become centered dialogs */
+  .sheet{border:1px solid var(--line);box-shadow:0 30px 80px -20px rgba(0,0,0,.6)}
+}
+@media (min-width:1280px){
+  #view>.grid{grid-template-columns:repeat(8,minmax(0,1fr))}
+  #view>.row[data-act=bud],#view>.row[data-act=goal]{grid-column:span 4}
+}
 </style>
 </head>
 <body>
@@ -518,7 +577,7 @@ function vSet(){
   <div class="sgt">بکاپ</div><div class="sg">${(()=>{const lb=localStorage.getItem('bd-lastbk'),old=!lb||(D(today())-D(lb))/864e5>7;return row('icl','cl','#3b82f6','ارسال بکاپ به Files / iCloud',(lb?'آخرین بکاپ: '+jd(lb):'هنوز بکاپ نگرفتی')+(old?' · ⏰ وقت بکاپ جدیده':''),ch)})()}${row('ex','⬇','#9ccc65','ذخیره‌ی بکاپ','خروجی فایل JSON',ch)}${row('im','⬆','#4dd0e1','بازیابی از فایل','جایگزینی با فایل بکاپ',ch)}</div>
   <div class="sgt">ورود و خروج اطلاعات</div><div class="sg">${row('csv','📊','#ffd21f','خروجی اکسل (CSV)','همه‌ی تراکنش‌ها با تاریخ شمسی',ch)}${row('imcsv','📊','#2fe6d3','وارد کردن از اکسل (CSV)','تاریخ، نوع، دسته، حساب، مبلغ، توضیح',ch)}${row('impc','📥','#ff9f43','وارد کردن بکاپ CANdo','اطلاعات اپ مالی قبلی را اضافه کن',ch)}</div>
   <div class="sgt">منطقه‌ی خطر</div><div class="sg">${row('wipe','🗑','#ff5c7a','پاک کردن همه‌ی اطلاعات','تراکنش‌ها، حساب‌ها، دسته‌ها و بودجه‌ها','','dng')}</div>
-  <div class="msg" id="msg" style="text-align:center"></div><div class="empty" style="font-size:12px;padding:10px">اطلاعات فقط روی همین دستگاه ذخیره می‌شود.<br>نسخه‌ی 1.5</div>`;
+  <div class="msg" id="msg" style="text-align:center"></div><div class="empty" style="font-size:12px;padding:10px">اطلاعات فقط روی همین دستگاه ذخیره می‌شود.<br>نسخه‌ی 1.6</div>`;
 }
 let _pv='home';
 function render(){
