@@ -367,6 +367,21 @@ html.l .tile:not(.add)::before{background:linear-gradient(180deg,rgba(255,255,25
 .spair{background:color-mix(in srgb,#fff 10%,transparent)!important;-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px)}
 .spair .tile.sm{border:0!important}
 @media (hover:hover){.tile:not(.add){transition:transform .15s,box-shadow .2s}.tile:not(.add):hover{transform:translateY(-2px)}}
+
+/* glass summary cards v1.7.1 */
+.hero .hn,.hero .hi{position:relative;isolation:isolate;overflow:hidden;-webkit-backdrop-filter:blur(18px) saturate(1.5);backdrop-filter:blur(18px) saturate(1.5);border:1px solid color-mix(in srgb,#fff 13%,transparent)!important;--gs:inset 0 1px 0 color-mix(in srgb,#fff 20%,transparent),0 12px 28px -18px rgba(0,0,0,.7);box-shadow:var(--gs)}
+.hero .hn{background:linear-gradient(135deg,color-mix(in srgb,var(--y) 30%,transparent),color-mix(in srgb,var(--t) 18%,transparent) 70%,color-mix(in srgb,var(--card) 40%,transparent))}
+.hero .hi{background:linear-gradient(155deg,color-mix(in srgb,var(--c2) 55%,transparent),color-mix(in srgb,var(--card) 35%,transparent))}
+.hero .hi.in{background:linear-gradient(155deg,color-mix(in srgb,var(--pos) 16%,transparent),color-mix(in srgb,var(--card) 40%,transparent))}
+.hero .hi.out{background:linear-gradient(155deg,color-mix(in srgb,var(--neg) 16%,transparent),color-mix(in srgb,var(--card) 40%,transparent))}
+.hero .hn::before,.hero .hi::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(180deg,color-mix(in srgb,#fff 11%,transparent),transparent 45%)}
+.hero button.on{box-shadow:var(--gs),inset 0 0 0 2px var(--y)}
+@media (hover:hover){.hero button:not(.on):hover{box-shadow:var(--gs),inset 0 0 0 1px color-mix(in srgb,#fff 22%,transparent)}}
+html.l .hero .hn,html.l .hero .hi{border-color:rgba(255,255,255,.8)!important;--gs:inset 0 1px 0 #fff,0 10px 24px -16px rgba(40,20,90,.3)}
+html.l .hero .hi{background:linear-gradient(155deg,rgba(255,255,255,.7),rgba(255,255,255,.45))}
+html.l .hero .hi.in{background:linear-gradient(155deg,color-mix(in srgb,var(--pos) 14%,rgba(255,255,255,.6)),rgba(255,255,255,.45))}
+html.l .hero .hi.out{background:linear-gradient(155deg,color-mix(in srgb,var(--neg) 12%,rgba(255,255,255,.6)),rgba(255,255,255,.45))}
+html.l .hero .hn{background:linear-gradient(135deg,color-mix(in srgb,var(--y) 22%,rgba(255,255,255,.55)),color-mix(in srgb,var(--t) 14%,rgba(255,255,255,.5)))}
 </style>
 </head>
 <body>
@@ -595,7 +610,7 @@ function vSet(){
   <div class="sgt">بکاپ</div><div class="sg">${(()=>{const lb=localStorage.getItem('bd-lastbk'),old=!lb||(D(today())-D(lb))/864e5>7;return row('icl','cl','#3b82f6','ارسال بکاپ به Files / iCloud',(lb?'آخرین بکاپ: '+jd(lb):'هنوز بکاپ نگرفتی')+(old?' · ⏰ وقت بکاپ جدیده':''),ch)})()}${row('ex','⬇','#9ccc65','ذخیره‌ی بکاپ','خروجی فایل JSON',ch)}${row('im','⬆','#4dd0e1','بازیابی از فایل','جایگزینی با فایل بکاپ',ch)}</div>
   <div class="sgt">ورود و خروج اطلاعات</div><div class="sg">${row('csv','📊','#ffd21f','خروجی اکسل (CSV)','همه‌ی تراکنش‌ها با تاریخ شمسی',ch)}${row('imcsv','📊','#2fe6d3','وارد کردن از اکسل (CSV)','تاریخ، نوع، دسته، حساب، مبلغ، توضیح',ch)}${row('impc','📥','#ff9f43','وارد کردن بکاپ CANdo','اطلاعات اپ مالی قبلی را اضافه کن',ch)}</div>
   <div class="sgt">منطقه‌ی خطر</div><div class="sg">${row('wipe','🗑','#ff5c7a','پاک کردن همه‌ی اطلاعات','تراکنش‌ها، حساب‌ها، دسته‌ها و بودجه‌ها','','dng')}</div>
-  <div class="msg" id="msg" style="text-align:center"></div><div class="empty" style="font-size:12px;padding:10px">اطلاعات فقط روی همین دستگاه ذخیره می‌شود.<br>نسخه‌ی 1.7</div>`;
+  <div class="msg" id="msg" style="text-align:center"></div><div class="empty" style="font-size:12px;padding:10px">اطلاعات فقط روی همین دستگاه ذخیره می‌شود.<br>نسخه‌ی 1.7.1</div>`;
 }
 let _pv='home';
 function render(){
