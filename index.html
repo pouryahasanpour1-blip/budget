@@ -263,6 +263,33 @@ svg.lic{width:58%;height:58%;fill:none;stroke:currentColor;stroke-width:1.7;stro
   .ash{max-width:560px}
   #csh{max-width:820px}
 }
+
+/* Accessibility (v1.5) */
+:focus-visible{outline:2px solid var(--y);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+/* Desktop layout (v1.5) — sidebar navigation, only ≥1024px */
+@media (min-width:1024px){
+  body{max-width:none;margin:0;padding:24px 36px 48px calc(272px + 36px);padding-inline:calc(272px + 36px) 36px}
+  .top,#view{max-width:1200px;margin-inline:auto}
+  .top{position:sticky;top:12px;z-index:2;flex-direction:row!important;align-items:center;gap:16px;padding:10px 14px;margin-bottom:20px}
+  #tabs{top:0;bottom:0;right:0;left:auto;transform:none;width:272px;border-radius:0;flex-direction:column;align-items:stretch;justify-content:flex-start;gap:4px;padding:136px 16px 20px;border:0;border-inline-start:1px solid var(--line);box-shadow:none;background:color-mix(in srgb,var(--card) 92%,transparent)}
+  #tabs::before{content:"بودجه";position:absolute;top:26px;right:22px;font-size:24px;font-weight:800;letter-spacing:-.3px;background:var(--g);-webkit-background-clip:text;background-clip:text;color:transparent}
+  #tabs button{flex:none;flex-direction:row;justify-content:flex-start;gap:12px;padding:12px 14px!important;border-radius:14px;text-align:right}
+  #tabs button small{font-size:14.5px!important;font-weight:600}
+  #tabs button svg{width:21px!important;height:21px!important}
+  #tabs button:hover:not(.on){background:color-mix(in srgb,var(--txt) 7%,transparent);color:var(--txt)}
+  #tabs button.on svg{transform:none}
+  #tabs [data-v=set]{margin-top:auto}
+  #tabs [data-v=set].al::after{top:50%;inset-inline-end:14px;transform:translateY(-50%)}
+  .qk,html .qk{display:flex!important;position:fixed;top:76px;bottom:auto;right:16px!important;left:auto!important;width:240px;height:46px;border-radius:14px;transform:none!important;font-size:22px;align-items:center;justify-content:center;gap:8px;z-index:4}
+  .qk::after{content:"ثبت سریع";font-size:14.5px;font-weight:800}
+  .qk:hover{filter:brightness(1.06)}
+  .bg{align-items:center;padding:24px}
+  .tile,.card,.hero button{transition:transform .15s,box-shadow .2s,background .2s}
+  .tile:hover{transform:translateY(-2px)}
+  .card[data-act]:hover{box-shadow:inset 0 0 0 1px var(--line)}
+}
+@media (min-width:1024px) and (prefers-reduced-motion:reduce){.tile:hover{transform:none}}
 </style>
 </head>
 <body>
@@ -491,7 +518,7 @@ function vSet(){
   <div class="sgt">بکاپ</div><div class="sg">${(()=>{const lb=localStorage.getItem('bd-lastbk'),old=!lb||(D(today())-D(lb))/864e5>7;return row('icl','cl','#3b82f6','ارسال بکاپ به Files / iCloud',(lb?'آخرین بکاپ: '+jd(lb):'هنوز بکاپ نگرفتی')+(old?' · ⏰ وقت بکاپ جدیده':''),ch)})()}${row('ex','⬇','#9ccc65','ذخیره‌ی بکاپ','خروجی فایل JSON',ch)}${row('im','⬆','#4dd0e1','بازیابی از فایل','جایگزینی با فایل بکاپ',ch)}</div>
   <div class="sgt">ورود و خروج اطلاعات</div><div class="sg">${row('csv','📊','#ffd21f','خروجی اکسل (CSV)','همه‌ی تراکنش‌ها با تاریخ شمسی',ch)}${row('imcsv','📊','#2fe6d3','وارد کردن از اکسل (CSV)','تاریخ، نوع، دسته، حساب، مبلغ، توضیح',ch)}${row('impc','📥','#ff9f43','وارد کردن بکاپ CANdo','اطلاعات اپ مالی قبلی را اضافه کن',ch)}</div>
   <div class="sgt">منطقه‌ی خطر</div><div class="sg">${row('wipe','🗑','#ff5c7a','پاک کردن همه‌ی اطلاعات','تراکنش‌ها، حساب‌ها، دسته‌ها و بودجه‌ها','','dng')}</div>
-  <div class="msg" id="msg" style="text-align:center"></div><div class="empty" style="font-size:12px;padding:10px">اطلاعات فقط روی همین دستگاه ذخیره می‌شود.<br>نسخه‌ی 1.4</div>`;
+  <div class="msg" id="msg" style="text-align:center"></div><div class="empty" style="font-size:12px;padding:10px">اطلاعات فقط روی همین دستگاه ذخیره می‌شود.<br>نسخه‌ی 1.5</div>`;
 }
 let _pv='home';
 function render(){
@@ -1082,4 +1109,17 @@ if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js').catch((
 </body>
 </html>
 
+<script>
+/* Keyboard shortcuts (v1.5): N quick add, 1-5 tabs, Esc closes the top sheet */
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){const o=[...document.querySelectorAll('.bg.open')].pop();if(o){e.preventDefault();o.dispatchEvent(new MouseEvent('click',{bubbles:true}))}return}
+  const t=e.target;if(t&&(t.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)))return;
+  if(e.ctrlKey||e.metaKey||e.altKey||document.querySelector('.bg.open'))return;
+  const lk=document.getElementById('lk');if(lk&&getComputedStyle(lk).display!=='none')return;
+  const k=e.key.toLowerCase();
+  if(k==='n'||k==='ث'){const q=document.getElementById('qk');if(q){e.preventDefault();q.click()}return}
+  const n='12345'.indexOf(k)>=0?'12345'.indexOf(k):'۱۲۳۴۵'.indexOf(k);
+  if(n>=0){const b=document.querySelectorAll('#tabs [data-v]')[n];if(b){e.preventDefault();b.click()}}
+});
+</script>
 <script src="sync.js"></script>
