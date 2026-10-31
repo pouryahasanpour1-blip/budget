@@ -290,6 +290,13 @@ svg.lic{width:58%;height:58%;fill:none;stroke:currentColor;stroke-width:1.7;stro
   .card[data-act]:hover{box-shadow:inset 0 0 0 1px var(--line)}
 }
 @media (min-width:1024px) and (prefers-reduced-motion:reduce){.tile:hover{transform:none}}
+/* Arrows (v1.6.1): SVG chevrons so RTL never flips them */
+svg.chv{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;display:block}
+.top .nv button:not(.dlb),.jnb{display:grid;place-items:center;padding:0}
+.sh i{width:30px;height:30px;background:color-mix(in srgb,var(--y) 14%,transparent);color:var(--y);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--y) 30%,transparent);transition:background .2s}
+.sh i svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round;transition:transform .25s}
+.sh i:not(.fd) svg{transform:rotate(180deg)}
+@media (hover:hover){.sh:hover i{background:color-mix(in srgb,var(--y) 24%,transparent)}}
 /* Desktop redesign (v1.6) — laptop only, same theme colors */
 @media (min-width:1024px){
   #tabs{background:var(--card);padding-top:140px}
@@ -310,7 +317,8 @@ svg.lic{width:58%;height:58%;fill:none;stroke:currentColor;stroke-width:1.7;stro
   .hero .hi i{width:46px;height:46px;border-radius:15px}
   .hero .hi b{font-size:20px}.hero .hi small{font-size:12.5px}
   .hero button:hover{box-shadow:inset 0 0 0 1px var(--line)}
-  #view>.sh{margin:10px 2px -2px;padding:0 4px}
+  #view>.sh{margin:10px 2px -2px;padding:0 4px;justify-content:flex-start;gap:12px}
+  #jcg .sheet{max-width:440px}
   #view>.grid>.tile,#view>.grid>.spair{height:136px}
   #view>.tw{grid-column:1/-1}
   /* Charts never grow taller than the screen */
@@ -355,7 +363,7 @@ svg.lic{width:58%;height:58%;fill:none;stroke:currentColor;stroke-width:1.7;stro
 <div class="top">
   <div class="seg" id="seg" role="tablist"><button data-m="d">روزانه</button><button data-m="m">ماهانه</button><button data-m="y">سالانه</button></div>
   <select id="md" aria-label="بازه" hidden><option value="d">روزانه</option><option value="m">ماهانه</option><option value="y">سالانه</option></select>
-  <div class="nv"><button id="pv" aria-label="قبلی">›</button><button id="dl" class="dlb" aria-label="انتخاب تاریخ"></button><button id="nx" aria-label="بعدی">‹</button></div>
+  <div class="nv"><button id="pv" aria-label="قبلی"><svg class="chv" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button><button id="dl" class="dlb" aria-label="انتخاب تاریخ"></button><button id="nx" aria-label="بعدی"><svg class="chv" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button></div>
   <button class="ib" id="hd" hidden>👁</button><button class="ib" id="th" hidden>🎨</button>
 </div>
 <div id="view"></div>
@@ -403,7 +411,7 @@ svg.lic{width:58%;height:58%;fill:none;stroke:currentColor;stroke-width:1.7;stro
 <div class="bg" id="srbg"><div class="sheet" style="max-height:92vh;overflow:auto"><h2>🎙 میانبر Siri</h2><div class="hint" style="text-align:right;line-height:1.9;font-size:13px;margin-bottom:10px">بعد از ساختن این میانبر، کافیه به Siri بگی <b>«ثبت خرج»</b> و بعد بگی مثلاً <b>«ناهار ۱۵۰ هزار»</b>. مبلغ و دسته خودکار پر می‌شن.</div><div class="lbl">اول آدرس رو کپی کن</div><input id="sru" readonly dir="ltr" style="font-size:12px"><button class="btn" id="src" style="margin:8px 0 14px">📋 کپی آدرس</button><div class="lbl">مراحل ساخت در اپ Shortcuts</div><div class="ssl"><div class="sst"><i>۱</i><div><b>اپ Shortcuts رو باز کن</b><small>پایین صفحه برو تب <b>Shortcuts</b> و بالا دکمه‌ی <b>＋</b> رو بزن.</small></div></div><div class="sst"><i>۲</i><div><b>اکشن Ask for Input</b><small>توی کادر جستجو بنویس <b>Ask for Input</b> و انتخابش کن. جای Prompt بنویس: <b>چی خرج کردی؟</b></small></div></div><div class="sst"><i>۳</i><div><b>اکشن URL</b><small>جستجو کن <b>URL</b> و اضافه‌ش کن. آدرسی که کپی کردی رو اونجا بچسبون.</small></div></div><div class="sst"><i>۴</i><div><b>متن Siri رو تهِ آدرس بذار</b><small>مکان‌نما رو ببر آخرِ آدرس (بعد از <b>add=</b>)، از نوار بالای کیبورد متغیر <b>Provided Input</b> رو بزن.</small></div></div><div class="sst"><i>۵</i><div><b>اکشن Open URLs</b><small>جستجو کن <b>Open URLs</b> و اضافه‌ش کن. خودش به URL مرحله‌ی قبل وصل می‌شه.</small></div></div><div class="sst"><i>۶</i><div><b>اسم بذار</b><small>بالای صفحه روی اسم میانبر بزن و بنویس <b>ثبت خرج</b>، بعد <b>Done</b>.</small></div></div></div><div class="lbl">مثال‌هایی که می‌تونی بگی</div><div class="hint" style="text-align:right;line-height:2;font-size:13px">«قهوه ۸۵ هزار» · «تاکسی ۱۲۰ هزار #کار» · «خرید ۲ میلیون»</div><div class="lbl">اگه کار نکرد</div><div class="hint" style="text-align:right;line-height:1.9;font-size:12.5px">• اگه قفل رمز روشنه، اول رمز رو می‌زنی و بعد تراکنش ثبت می‌شه.<br>• اگه به‌جای اپ، Safari باز شد، اطلاعات Safari از اپ صفحه‌ی اصلی جداست. اپ رو از همون Safari دوباره به Home Screen اضافه کن یا آدرس رو از داخل اپ کپی کن.<br>• میانبر رو می‌تونی به‌عنوان ویجت یا Action Button هم بذاری.</div><button class="btn s" id="srx" style="margin-top:12px">بستن</button></div></div>
 <div class="bg" id="rcg"><div class="sheet" style="max-height:92vh"><h2>🔁 تراکنش‌های تکراری</h2><div id="rlist"></div><button class="btn s" id="rx" style="margin-top:10px">بستن</button></div></div>
 <div id="lk"><h2 id="lt" style="margin:0"></h2><div id="ld"></div><div id="lp"></div><button class="chip" id="lb" style="display:none">🔓 ورود با Face ID / اثر انگشت</button><button class="chip" id="lc">لغو</button></div>
-<div class="bg" id="jcg"><div class="sheet jcs"><div class="jch"><small>تاریخ انتخاب‌شده</small><b id="jcsel"></b></div><div class="jcn"><button class="jnb" id="jcp" aria-label="ماه قبل">›</button><div><b id="jcl"></b></div><button class="jnb" id="jcn" aria-label="ماه بعد">‹</button></div><div class="cg" id="jcgrid"></div><div class="jcf"><button class="jtd" id="jct">امروز</button><button class="btn s" id="jcx">بستن</button></div></div></div>
+<div class="bg" id="jcg"><div class="sheet jcs"><div class="jch"><small>تاریخ انتخاب‌شده</small><b id="jcsel"></b></div><div class="jcn"><button class="jnb" id="jcp" aria-label="ماه قبل"><svg class="chv" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button><div><b id="jcl"></b></div><button class="jnb" id="jcn" aria-label="ماه بعد"><svg class="chv" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button></div><div class="cg" id="jcgrid"></div><div class="jcf"><button class="jtd" id="jct">امروز</button><button class="btn s" id="jcx">بستن</button></div></div></div>
 <div class="bg" id="cdg"><div class="sheet"><h2>📥 بکاپ CANdo</h2><div class="hint" style="text-align:right;line-height:1.9;font-size:13px">فایل بکاپ CANdo را انتخاب کن یا متن بکاپ را اینجا بچسبان. اطلاعات به داده‌های فعلی <b>اضافه</b> می‌شود و چیزی پاک نمی‌شود. اگر دوباره وارد کنی، موارد تکراری ساخته نمی‌شود.</div><button class="btn s" id="cdf" style="margin-bottom:8px">📂 انتخاب فایل بکاپ</button><textarea id="cdt" rows="5" placeholder="یا متن بکاپ را اینجا بچسبان..." style="width:100%;background:var(--card);border:0;border-radius:16px;padding:12px;outline:0;font-size:12px;direction:ltr;resize:none"></textarea><div class="msg" id="cdm"></div><div class="two"><button class="btn" id="cdr">وارد کن</button><button class="btn s" id="cdx">بستن</button></div></div></div>
 <input type="file" id="fi2" accept=".json,application/json,text/plain" hidden>
 <div class="bg" id="swg"><div class="sheet"><h2>این تراکنش</h2><button class="btn" id="swc" style="margin-bottom:8px">📋 کپی با تاریخ امروز</button><button class="btn" id="swd" style="background:var(--neg);color:#fff;margin-bottom:8px">🗑 حذف</button><button class="btn s" id="swx">انصراف</button></div></div>
@@ -509,7 +517,7 @@ function vHome(){
   const fill=c=>{const tot=((c.t==='out'?S.bud[c.id]:(S.goal||{})[c.id])||0)*P.k;if(!tot)return'';const v=mp[c.id]||0,p=Math.min(100,v/tot*100),o=c.t==='out'&&v>tot;return `;background:linear-gradient(to top,color-mix(in srgb,${o?'var(--neg)':'var(--c)'} 46%,var(--card)) ${p}%,color-mix(in srgb,var(--c) 14%,var(--card)) ${p}%)${o?';box-shadow:inset 0 0 0 1.5px var(--neg)':''}`};
   const tile=c=>`<button class="tile${c.z==='s'?' sm':c.z==='l'?' lg':''}" style="--c:${c.c}${fill(c)}" data-act="add" data-id="${c.id}"><small>${esc(c.n)}</small><i>${CIC(c.e)}</i><b>${f(by[c.id]||0)}</b></button>`;
   const grp=a=>{let o='';for(let i=0;i<a.length;i++){if(a[i].z==='s'&&a[i+1]&&a[i+1].z==='s'){o+=`<div class="spair">${tile(a[i])}${tile(a[i+1])}</div>`;i++}else o+=tile(a[i])}return o};
-  const sec=(t,tot)=>`<button class="sh" data-act="fold" data-t="${t}"><b>${t==='out'?'هزینه':'درآمد'} <em class="${t==='out'?'neg':'pos'}">${f(tot)} ${S.u}</em></b><i>${S.fold[t]?'⌃':'⌄'}</i></button>`+(S.fold[t]?'':`<div class="grid" style="--cols:${S.cols||3}">${grp(S.cats.filter(c=>c.t===t))}</div>`);
+  const sec=(t,tot)=>`<button class="sh" data-act="fold" data-t="${t}"><b>${t==='out'?'هزینه':'درآمد'} <em class="${t==='out'?'neg':'pos'}">${f(tot)} ${S.u}</em></b><i class="${S.fold[t]?'fd':''}"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></i></button>`+(S.fold[t]?'':`<div class="grid" style="--cols:${S.cols||3}">${grp(S.cats.filter(c=>c.t===t))}</div>`);
   const sb=(v,l,c,val)=>`<button data-act="cm" data-v="${v}" class="${cOpen&&CM===v?'on':''}"><small>${l}</small><b class="${c}">${f(val)}</b></button>`;
   const net=I-O,hb=(v,cls,ic,l,val,c)=>`<button data-act="cm" data-v="${v}" class="hi ${cls}${cOpen&&CM===v?' on':''}"><i><svg viewBox="0 0 24 24">${ic}</svg></i><div><small>${l}</small><b class="${c} numf">${f(val)}</b></div></button>`;
   const car=`<div class="hero"><button data-act="cm" data-v="net" class="hn${cOpen&&CM==='net'?' on':''}"><small>مانده</small><b class="${net<0?'neg ':''}numf">${f(net)} <em>${S.u}</em></b></button><div class="hio">${hb('in','in','<path d="M7 7l10 10"/><path d="M17 8v9H8"/>','درآمد',I,'pos')}${hb('out','out','<path d="M7 17L17 7"/><path d="M8 7h9v9"/>','هزینه',O,'neg')}</div></div>`;
@@ -577,7 +585,7 @@ function vSet(){
   <div class="sgt">بکاپ</div><div class="sg">${(()=>{const lb=localStorage.getItem('bd-lastbk'),old=!lb||(D(today())-D(lb))/864e5>7;return row('icl','cl','#3b82f6','ارسال بکاپ به Files / iCloud',(lb?'آخرین بکاپ: '+jd(lb):'هنوز بکاپ نگرفتی')+(old?' · ⏰ وقت بکاپ جدیده':''),ch)})()}${row('ex','⬇','#9ccc65','ذخیره‌ی بکاپ','خروجی فایل JSON',ch)}${row('im','⬆','#4dd0e1','بازیابی از فایل','جایگزینی با فایل بکاپ',ch)}</div>
   <div class="sgt">ورود و خروج اطلاعات</div><div class="sg">${row('csv','📊','#ffd21f','خروجی اکسل (CSV)','همه‌ی تراکنش‌ها با تاریخ شمسی',ch)}${row('imcsv','📊','#2fe6d3','وارد کردن از اکسل (CSV)','تاریخ، نوع، دسته، حساب، مبلغ، توضیح',ch)}${row('impc','📥','#ff9f43','وارد کردن بکاپ CANdo','اطلاعات اپ مالی قبلی را اضافه کن',ch)}</div>
   <div class="sgt">منطقه‌ی خطر</div><div class="sg">${row('wipe','🗑','#ff5c7a','پاک کردن همه‌ی اطلاعات','تراکنش‌ها، حساب‌ها، دسته‌ها و بودجه‌ها','','dng')}</div>
-  <div class="msg" id="msg" style="text-align:center"></div><div class="empty" style="font-size:12px;padding:10px">اطلاعات فقط روی همین دستگاه ذخیره می‌شود.<br>نسخه‌ی 1.6</div>`;
+  <div class="msg" id="msg" style="text-align:center"></div><div class="empty" style="font-size:12px;padding:10px">اطلاعات فقط روی همین دستگاه ذخیره می‌شود.<br>نسخه‌ی 1.6.1</div>`;
 }
 let _pv='home';
 function render(){
